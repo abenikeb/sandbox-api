@@ -6,23 +6,25 @@ import { User } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly catModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const createdCat = await this.catModel.create(createUserDto);
+    const createdCat = await this.userModel.create(createUserDto);
     return createdCat;
   }
 
   async findAll(): Promise<User[]> {
-    return this.catModel.find().exec();
+    return this.userModel.find().exec();
   }
 
   async findOne(id: string): Promise<User> {
-    return this.catModel.findOne({ _id: id }).exec();
+    return this.userModel.findOne({ _id: id }).exec();
   }
 
   async delete(id: string) {
-    const deletedCat = await this.catModel
+    const deletedCat = await this.userModel
       .findByIdAndRemove({ _id: id })
       .exec();
     return deletedCat;
