@@ -11,8 +11,8 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const createdCat = await this.userModel.create(createUserDto);
-    return createdCat;
+    const createdUser = await this.userModel.create(createUserDto);
+    return createdUser;
   }
 
   async findAll(): Promise<User[]> {
@@ -24,9 +24,9 @@ export class UserService {
   }
 
   async delete(id: string) {
-    const deletedCat = await this.userModel
+    const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
       .exec();
-    return deletedCat;
+    return deletedUser;
   }
 }

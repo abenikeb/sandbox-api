@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 
 @Controller('user')
-export class CatsController {
+export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
