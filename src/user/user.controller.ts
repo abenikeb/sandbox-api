@@ -9,7 +9,7 @@ export class UserController {
 
   @Post('/signup')
   async create(@Body() createUserDto: CreateUserDto) {
-    console.log('BODY*', createUserDto);
+    console.log('createUserDto', createUserDto);
     await this.userService.create(createUserDto);
   }
 
