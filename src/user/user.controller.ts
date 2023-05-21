@@ -7,8 +7,9 @@ import { User } from './schemas/user.schema';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('/signup')
   async create(@Body() createUserDto: CreateUserDto) {
+    console.log('BODY*', createUserDto);
     await this.userService.create(createUserDto);
   }
 
