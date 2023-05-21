@@ -23,6 +23,10 @@ export class UserService {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
+  async findOneWithUser(username: string): Promise<User> {
+    return this.userModel.findOne({ username: username }).exec();
+  }
+
   async delete(id: string) {
     const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
