@@ -25,6 +25,9 @@ export class ConfigurationsService {
   async findAll():Promise<Configuration[]> {
     return this.configurationModel.find().exec();
   }
+  async findBy(app_secret:string,fabric_app_id:string):Promise<Configuration>{
+    return this.configurationModel.findOne({app_secret:app_secret}).exec()
+  }
 
   async findOne(id: string): Promise<Configuration>{
     return this.configurationModel.findOne({_id:id}).exec()

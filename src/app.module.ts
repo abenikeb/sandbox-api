@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
+import { MokeApiModule } from './moke_api/moke_api.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigurationsModule } from './configurations/configurations.module';
     AuthModule,
     ConfigModule,
     ConfigurationsModule,
+    MokeApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
