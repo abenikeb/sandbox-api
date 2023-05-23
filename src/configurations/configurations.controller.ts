@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ConfigurationsService } from './configurations.service';
-import { UpdateConfigurationDto } from './dto/update-configuration.dto';
 
 @Controller('configurations')
 export class ConfigurationsController {

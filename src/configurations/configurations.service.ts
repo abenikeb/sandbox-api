@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateConfigurationDto } from './dto/create-configuration.dto';
-import { UpdateConfigurationDto } from './dto/update-configuration.dto';
 import {Configuration} from './schemas/configuration.schema'
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
