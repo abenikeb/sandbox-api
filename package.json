@@ -27,7 +27,11 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/mongoose": "^9.2.2",
     "@nestjs/platform-express": "^9.0.0",
+<<<<<<< HEAD
     "child_process": "^1.0.2",
+=======
+    "bcrypt": "^5.0.1",
+>>>>>>> main
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "crypto": "^1.0.1",
@@ -39,6 +43,7 @@
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
+    "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "29.5.1",
     "@types/node": "18.16.12",
