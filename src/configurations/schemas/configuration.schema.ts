@@ -20,5 +20,9 @@ export class Configuration {
     public_key:string;
     @Prop({ required: true, type: User})
     user_id:User;
+    @Prop({ required: true })
+    token:string;
+    @Prop({ required: true })
+    order_id:string;
 }
 export const ConfigurationSchema = SchemaFactory.createForClass(Configuration);

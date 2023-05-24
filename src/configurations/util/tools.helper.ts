@@ -27,6 +27,9 @@ export function generatePrepayId(){
 export function generateFabricToken(){
     return generateString(32,"Bearer ");
 }
+export function generateNonceStr(){
+    return generateString(32,"");
+}
 export function generateMerchantAppId(){
     return Math.floor(
         Math.random() * (999999999999999 - 100000000000000) + 100000000000000
