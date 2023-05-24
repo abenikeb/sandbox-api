@@ -17,8 +17,11 @@ export class User {
   @Prop({ required: true, type: Boolean, default: true })
   status: string;
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: Date })
+  updatedAt: Date;
 
   @Prop()
   salt: string;

@@ -30,16 +30,22 @@ export class UserService {
       salt: salt,
     };
 
-    const { password, ...newPayload } = userData;
+    // const { password, ...newPayload } = userData;
 
     let createdUser = await this.userModel.create(userData);
-    createdUser.save();
+    createdUser = await createdUser.save();
+
+    // const { password, ...otherUserInfo } = createdUser;
+
+    // console.log(otherUserInfo);
+
+    const token = await this.jwtService.signAsync(userData);
 
     return res
-      .header('x-auth-token', await this.jwtService.signAsync(newPayload))
+      .header('x-auth-token', token)
       .header('access-control-expose-headers', 'x-auth-token')
       .json({
-        userInfo: newPayload,
+        userInfo: createdUser,
       });
   }
 
