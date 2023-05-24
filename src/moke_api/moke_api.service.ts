@@ -27,15 +27,19 @@ export class MokeApiService {
         "error_msg":"string_s"
       }
     }
+
+    const time= new Date()
     return {
       "effectiveDate":Date.now(),
-      "expirationDate":Date.now(),
+      "expirationDate":new Date(time.getMinutes()+5*60),
       "token":generateFabricToken()
     }
   }
   async createOrder(fabric_app_id:string,merchant_id:string,short_code:string,merch_order_id:string){
     const result = await this.configurationsService.findByAll(fabric_app_id,merchant_id,short_code);
-    console.log(result)
+    console.log(result.private_key)
+    console.log("=========================================pub================================")
+    console.log(result.public_key)
     if(result==null){
       return {
         "error_code":"string",
