@@ -9,7 +9,7 @@ export class ConfigurationsService {
     @InjectModel(Configuration.name) private readonly configurationModel:Model<Configuration>,
   ){}
   async create(id:string): Promise<Configuration> {
-    const RSAKeyPairs = generateRSAKeyPairs()
+    const RSAKeyPairs = await generateRSAKeyPairs()
     const createConfig = await this.configurationModel.create({
       merchant_id:generateMerchantAppId(),
       fabric_app_id:generateFabricAppKey(), 
@@ -38,8 +38,8 @@ export class ConfigurationsService {
     return this.configurationModel.findOne({_id:id}).exec()
   }
   
-  update(id: string): Promise<Configuration> {
-        const RSAKeyPairs = generateRSAKeyPairs();
+  async update(id: string): Promise<Configuration> {
+        const RSAKeyPairs = await generateRSAKeyPairs();
         return this.configurationModel.findOneAndUpdate({user_id:id},{
       private_key:RSAKeyPairs.privateKey,
       public_key:RSAKeyPairs.publicKey

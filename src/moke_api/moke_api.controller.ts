@@ -26,7 +26,7 @@ export class MokeApiController {
   createOrder(@Body() body:any , @Headers('X-APP-Key') fabric_app_id: any,@Headers('Authorization') token: any)
 {
   const biz = body.biz_content
-  if (!fabric_app_id || !body || !biz || !body.timestamp || !body.method || body.method!="payment.preorder" || !body.nonce_str) {
+  if (!token || !fabric_app_id || !body || !biz || !body.timestamp || !body.method || body.method!="payment.preorder" || !body.nonce_str) {
     return {
         "error_code":"string",
         "error_msg":"string"
@@ -44,7 +44,25 @@ export class MokeApiController {
         "error_msg":"transCurrency type must be ETB"
       }
   }
-  return this.mokeApiService.createOrder(fabric_app_id, biz.appid, biz.merch_code,biz.merch_order_id)
+  return this.mokeApiService.createOrder(token,fabric_app_id, biz.appid, biz.merch_code,biz.merch_order_id)
+}
+  @Post('queryOrder')  
+  queryOrder(@Body() body:any , @Headers('X-APP-Key') fabric_app_id: any,@Headers('Authorization') token: any)
+{
+  const biz = body.biz_content
+  if (!token || !fabric_app_id || !body || !biz || !body.timestamp || !body.method || body.method!="payment.queryorder" || !body.nonce_str || !body.version) {
+    return {
+        "error_code":"string",
+        "error_msg":"string"
+      }
+  } 
+  if(!body.sign_type || body.sign_type!="SHA256WithRSA"){
+    return {
+        "error_code":"string",
+        "error_msg":"sign type must be SHA256WithRSA"
+      }
+  }
+  return this.mokeApiService.queryOrder(token,fabric_app_id, biz.appid, biz.merch_code,biz.merch_order_id)
 }
   @Post()
   create(@Body() createMokeApiDto: CreateMokeApiDto) {
