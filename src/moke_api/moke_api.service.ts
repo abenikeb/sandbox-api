@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMokeApiDto } from './dto/create-moke_api.dto';
-import { UpdateMokeApiDto } from './dto/update-moke_api.dto';
-import { Configuration } from 'src/configurations/schemas/configuration.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { ConfigurationsService } from 'src/configurations/configurations.service';
 import {
   generateFabricToken,
@@ -22,6 +18,7 @@ export class MokeApiService {
     notify_url: '',
     business_type: '',
     trade_type: '',
+    trade_status: '',
   };
   // constructor(
   //   @InjectModel(Configuration.name) private readonly configurationModel:Model<Configuration>,
@@ -118,7 +115,6 @@ export class MokeApiService {
     );
     if (result == null) {
       console.log('@query Fail', this.info);
-
       return {
         error_code: 'string',
         error_msg: 'string_s',
@@ -132,6 +128,11 @@ export class MokeApiService {
       return {
         error_code: 'string',
         error_msg: 'merch_order_id not found',
+      };
+    } else if (this.info.trade_status != 'Completed') {
+      return {
+        error_code: 'string',
+        error_msg: 'payment not completed.',
       };
     } else {
       console.log('@query success', this.info);
@@ -153,16 +154,41 @@ export class MokeApiService {
       };
     }
   }
-  async payment(rawRequest: string) {
-    console.log(this.IsSorted(rawRequest));
-  }
-  IsSorted(rawRequest: string) {
-    const incomeing = rawRequest.split('&');
-    const expected = rawRequest.split('&').sort();
-    let equal = true;
-    for (let index = 0; index < incomeing.length; index++) {
-      equal = expected[index] === incomeing[index];
+  async payment(value: any, token: string, fabric_app_id: string) {
+    const result = await this.configurationsService.findByAll(
+      fabric_app_id,
+      value[0],
+      value[1],
+    );
+    if (result == null) {
+      console.log('@payment Fail', this.info);
+      return {
+        error_code: 'string',
+        error_msg: 'string_s',
+      };
+    } else if (token != this.info.token) {
+      return {
+        error_code: 'string',
+        error_msg: 'Authorization error',
+      };
+    } else if (value[3] != this.info.prepay_id) {
+      return {
+        error_code: 'string',
+        error_msg: 'Order not found',
+      };
+    } else if (value[2].length != 32) {
+      return {
+        error_code: 'string',
+        error_msg: 'Nonce string must be a 32 length',
+      };
+    } else {
+      this.info.trade_status = 'Completed';
+      return {
+        result: 'SUCCESS',
+        code: '0',
+        msg: 'Success',
+        trade_status: 'Completed',
+      };
     }
-    return equal;
   }
 }

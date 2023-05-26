@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Headers } from '@nestjs/common';
+import { Controller, Post, Body, Headers, Res } from '@nestjs/common';
 import { MokeApiService } from './moke_api.service';
 import { ApplyFabricTokenDto } from './dto/applyFabricToken.dto';
+import { Response } from 'express';
 
 @Controller('moke-api')
 export class MokeApiController {
@@ -97,9 +98,45 @@ export class MokeApiController {
         error_msg: 'string',
       };
     }
-    rawRequest.con;
-
-    this.mokeApiService.payment(rawRequest);
+    const request = body.rawRequest.split('&');
+    if (request.length != 7 || this.IsSorted(rawRequest) != true) {
+      return {
+        error_code: 'string',
+        error_msg: 'invalid raw request',
+      };
+    } else {
+      const expectedKey = [
+        'appid',
+        'merch_code',
+        'nonce_str',
+        'prepay_id',
+        'sign',
+        'sign_type',
+        'timestamp',
+      ];
+      const value = [];
+      for (let index = 0; index < request.length; index++) {
+        const key_value = request[index].split('=');
+        if (key_value.length != 2) {
+          return {
+            error_code: 'string',
+            error_msg: 'invalid raw requests',
+          };
+        } else {
+          const check = key_value[0] == expectedKey[index];
+          if (check) {
+            value.push(key_value[1]);
+            continue;
+          } else {
+            return {
+              error_code: 'string',
+              error_msg: 'invalid raw requests',
+            };
+          }
+        }
+      }
+      return this.mokeApiService.payment(value, token, fabric_app_id);
+    }
   }
   //Query Order
   @Post('queryOrder')
@@ -107,6 +144,7 @@ export class MokeApiController {
     @Body() body: any,
     @Headers('X-APP-Key') fabric_app_id: any,
     @Headers('Authorization') token: any,
+    @Res() res: Response,
   ) {
     const biz = body.biz_content;
     if (
@@ -138,5 +176,16 @@ export class MokeApiController {
       biz.merch_code,
       biz.merch_order_id,
     );
+  }
+  IsSorted(rawRequest: string) {
+    const incomeing = rawRequest.split('&');
+    const expected = rawRequest.split('&').sort();
+    let equal = true;
+    for (let index = 0; index < incomeing.length; index++) {
+      equal = expected[index] === incomeing[index];
+    }
+    console.log(expected);
+    console.log(equal);
+    return equal;
   }
 }
