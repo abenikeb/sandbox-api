@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMokeApiDto } from './dto/create-moke_api.dto';
 import { ConfigurationsService } from 'src/configurations/configurations.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import axios from 'axios';
 import {
   generateFabricToken,
   generateNonceStr,
@@ -19,10 +21,9 @@ export class MokeApiService {
     business_type: '',
     trade_type: '',
     trade_status: '',
+    trans_time: '',
   };
-  // constructor(
-  //   @InjectModel(Configuration.name) private readonly configurationModel:Model<Configuration>,
-  // ){}
+
   constructor(private readonly configurationsService: ConfigurationsService) {}
 
   create(createMokeApiDto: CreateMokeApiDto) {
@@ -36,8 +37,11 @@ export class MokeApiService {
     if (result == null) {
       console.log('@Apply Fail', this.info);
       return {
-        error_code: 'string',
-        error_msg: 'string_s',
+        errorCode: '49401031101',
+        errorSolution:
+          '1. Check whether the authentication token or Basic authentication information is correctly set in the interface.\n2. If the authentication information is set correctly, contact the management to confirm that it is not authorized to perform such operations.',
+        errorMsg:
+          'The operation is restricted and the access function is not authorized.Detail:Forbidden !\nerr:app key or app secret is invalid!\n',
       };
     } else {
       const time = new Date();
@@ -45,8 +49,8 @@ export class MokeApiService {
       this.info.token = token;
       console.log('@Apply success', this.info);
       return {
-        effectiveDate: Date.now(),
-        expirationDate: new Date(time.getMinutes() + 5 * 60),
+        effectiveDate: Date.now().toString(),
+        expirationDate: (Date.now() + 60 * 60 * 1000).toString(),
         token: token,
       };
     }
@@ -66,16 +70,21 @@ export class MokeApiService {
     );
     if (result == null) {
       console.log('@create Fail', this.info);
-
-      return {
-        error_code: 'string',
-        error_msg: 'string_s',
-      };
+      throw new HttpException(
+        {
+          errorCode: '60200087',
+          errorMsg: 'Organization does not exist.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else if (this.info.token !== token) {
-      return {
-        error_code: 'string',
-        error_msg: 'Authorization error',
-      };
+      throw new HttpException(
+        {
+          errorCode: '60200088',
+          errorMsg: 'Invalid or expired token.',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     } else {
       this.info.merch_order_id = merch_order_id;
       const prepay_id = generatePrepayId();
@@ -115,25 +124,37 @@ export class MokeApiService {
     );
     if (result == null) {
       console.log('@query Fail', this.info);
-      return {
-        error_code: 'string',
-        error_msg: 'string_s',
-      };
+      throw new HttpException(
+        {
+          errorCode: '60200087',
+          errorMsg: 'Organization does not exist.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else if (token != this.info.token) {
-      return {
-        error_code: 'string',
-        error_msg: 'Authorization error',
-      };
+      throw new HttpException(
+        {
+          errorCode: '60200088',
+          errorMsg: 'Invalid or expired token.',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     } else if (merch_order_id != this.info.merch_order_id) {
-      return {
-        error_code: 'string',
-        error_msg: 'merch_order_id not found',
-      };
+      throw new HttpException(
+        {
+          errorCode: '60200088',
+          errorMsg: 'Invalid merch_order_id.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else if (this.info.trade_status != 'Completed') {
-      return {
-        error_code: 'string',
-        error_msg: 'payment not completed.',
-      };
+      throw new HttpException(
+        {
+          errorCode: '60200088',
+          errorMsg: 'Order not completed.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else {
       console.log('@query success', this.info);
       return {
@@ -162,33 +183,67 @@ export class MokeApiService {
     );
     if (result == null) {
       console.log('@payment Fail', this.info);
-      return {
-        error_code: 'string',
-        error_msg: 'string_s',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Invalid raw request. Check if all the necessary parameters are correctly filled and sorted.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else if (token != this.info.token) {
       return {
         error_code: 'string',
         error_msg: 'Authorization error',
       };
     } else if (value[3] != this.info.prepay_id) {
-      return {
-        error_code: 'string',
-        error_msg: 'Order not found',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Invalid raw request. Check if all the necessary parameters are correctly filled and sorted.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else if (value[2].length != 32) {
-      return {
-        error_code: 'string',
-        error_msg: 'Nonce string must be a 32 length',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Invalid raw request. Check if all the necessary parameters are correctly filled and sorted.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else {
       this.info.trade_status = 'Completed';
+      this.info.trans_time = Date.now().toString();
+      await this.callback(value[0], value[1]);
       return {
         result: 'SUCCESS',
         code: '0',
         msg: 'Success',
         trade_status: 'Completed',
+        trans_time: this.info.trans_time,
       };
     }
+  }
+  async callback(appId: string, merch_code: string) {
+    // const url = 'http://localhost:8081/notify/transaction';
+    const response = await axios.post(this.info.notify_url, {
+      notify_url: this.info.notify_url,
+      appid: appId,
+      notify_time: Date.now().toString(),
+      merch_code: merch_code,
+      merch_order_id: this.info.merch_order_id,
+      payment_order_id: '00801104C911443200001002',
+      total_amount: this.info.total_amount,
+      trans_id: '87654567865',
+      trans_currency: 'ETB',
+      trade_status: this.info.trade_status,
+      trans_end_time: this.info.trans_time,
+      sign: 'AOwWQF0QDg0jzzs5otLYOunoR65GGgC3hyr+oYn8mm1Qph6Een7C…',
+      sign_type: 'SHA256WithRSA',
+    });
+    return response.status;
   }
 }

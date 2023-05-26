@@ -1,7 +1,14 @@
-import { Controller, Post, Body, Headers, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Headers,
+  Res,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { MokeApiService } from './moke_api.service';
 import { ApplyFabricTokenDto } from './dto/applyFabricToken.dto';
-import { Response } from 'express';
 
 @Controller('moke-api')
 export class MokeApiController {
@@ -14,11 +21,28 @@ export class MokeApiController {
   ) {
     console.log(body.appSecret); // Output the request body to the console
     console.log(headers); // Output the request headers to the console
-    if (!headers || !body.appSecret) {
-      return {
-        error_code: 'string',
-        error_msg: 'string',
-      };
+    if (!headers) {
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg: '49401024995:Parameter:X-APP-Key must be filled in.',
+          errorSolution:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!body.appSecret) {
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            '49401024995:Parameter:.appSecret less than minimum length. [Required string length at least 1 but was 0].',
+          errorSolution:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return this.mokeApiService.applyFabricToken(body.appSecret, headers);
   }
@@ -40,22 +64,38 @@ export class MokeApiController {
       body.method != 'payment.preorder' ||
       !body.nonce_str
     ) {
-      return {
-        error_code: 'string',
-        error_msg: 'string',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (!body.sign_type || body.sign_type != 'SHA256WithRSA') {
-      return {
-        error_code: 'string',
-        error_msg: 'sign type must be SHA256WithRSA',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            '49401024995:Parameter:.sign_type type mismatch. [Required enum value [HmacSHA256, SHA256WithRSA, SHA256withRSA]].',
+          errorSolution:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (!biz.trans_currency || biz.trans_currency != 'ETB') {
-      return {
-        error_code: 'string',
-        error_msg: 'transCurrency type must be ETB',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            '49401024995:Parameter:.trans_currency type mismatch. [Required value ETB].',
+          errorSolution:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (
       !biz.total_amount ||
@@ -64,10 +104,14 @@ export class MokeApiController {
       !biz.business_type ||
       !biz.trade_type
     ) {
-      return {
-        error_code: 'string',
-        error_msg: 'Required parameter is missing or is incorrectly filled',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return this.mokeApiService.createOrder(
       token,
@@ -85,7 +129,7 @@ export class MokeApiController {
     );
   }
   //payment
-  @Post('payment')
+  @Post('checkout')
   payment(
     @Body() body: any,
     @Headers('X-APP-Key') fabric_app_id: any,
@@ -100,10 +144,14 @@ export class MokeApiController {
     }
     const request = body.rawRequest.split('&');
     if (request.length != 7 || this.IsSorted(rawRequest) != true) {
-      return {
-        error_code: 'string',
-        error_msg: 'invalid raw request',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     } else {
       const expectedKey = [
         'appid',
@@ -118,22 +166,51 @@ export class MokeApiController {
       for (let index = 0; index < request.length; index++) {
         const key_value = request[index].split('=');
         if (key_value.length != 2) {
-          return {
-            error_code: 'string',
-            error_msg: 'invalid raw requests',
-          };
+          throw new HttpException(
+            {
+              errorCode: '49401024995',
+              errorMsg:
+                'Invalid raw request. Check if all the necessary parameters are correctly filled and sorted.',
+            },
+            HttpStatus.BAD_REQUEST,
+          );
         } else {
           const check = key_value[0] == expectedKey[index];
           if (check) {
             value.push(key_value[1]);
             continue;
           } else {
-            return {
-              error_code: 'string',
-              error_msg: 'invalid raw requests',
-            };
+            throw new HttpException(
+              {
+                errorCode: '49401024995',
+                errorMsg:
+                  'Invalid raw request. Check if all the necessary parameters are correctly filled and sorted.',
+              },
+              HttpStatus.BAD_REQUEST,
+            );
           }
         }
+      }
+      if (!value[5] || value[5] != 'SHA256WithRSA') {
+        throw new HttpException(
+          {
+            errorCode: '49401024995',
+            errorMsg:
+              '49401024995:Parameter:.sign_type type mismatch. [Required enum value [HmacSHA256, SHA256WithRSA, SHA256withRSA]].',
+            errorSolution:
+              'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (!value[4]) {
+        throw new HttpException(
+          {
+            errorCode: '60200099',
+            errorMsg: 'Verify the sign field failed.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
       return this.mokeApiService.payment(value, token, fabric_app_id);
     }
@@ -144,7 +221,7 @@ export class MokeApiController {
     @Body() body: any,
     @Headers('X-APP-Key') fabric_app_id: any,
     @Headers('Authorization') token: any,
-    @Res() res: Response,
+    // @Res() res: Response,x
   ) {
     const biz = body.biz_content;
     if (
@@ -158,16 +235,26 @@ export class MokeApiController {
       !body.nonce_str ||
       !body.version
     ) {
-      return {
-        error_code: 'string',
-        error_msg: 'string',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (!body.sign_type || body.sign_type != 'SHA256WithRSA') {
-      return {
-        error_code: 'string',
-        error_msg: 'sign type must be SHA256WithRSA',
-      };
+      throw new HttpException(
+        {
+          errorCode: '49401024995',
+          errorMsg:
+            '49401024995:Parameter:.sign_type type mismatch. [Required enum value [HmacSHA256, SHA256WithRSA, SHA256withRSA]].',
+          errorSolution:
+            'Incoming parameters are missing mandatory parameters.Check whether all required parameters in the interface have been assigned.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return this.mokeApiService.queryOrder(
       token,
@@ -184,8 +271,6 @@ export class MokeApiController {
     for (let index = 0; index < incomeing.length; index++) {
       equal = expected[index] === incomeing[index];
     }
-    console.log(expected);
-    console.log(equal);
     return equal;
   }
 }
