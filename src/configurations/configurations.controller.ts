@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ConfigurationsService } from './configurations.service';
 import { MongoExceptionFilter } from './util/errorHanddler';
+import { UpdateNotifyDto } from './dto/update-notify.dto';
 
 @Controller('configurations')
 export class ConfigurationsController {
@@ -68,7 +69,19 @@ export class ConfigurationsController {
   update(@Param('id') id: string) {
     return this.configurationsService.update(id);
   }
-
+  @Patch(':id')
+  updateNotify(@Param('id') id: string, @Body() body: UpdateNotifyDto) {
+    if (!body || !id) {
+      throw new HttpException(
+        {
+          error_code: '600089774',
+          error_msg: 'Required parameter is missing.',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return this.configurationsService.updateNotifyUrl(id, body.notify_url);
+  }
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.configurationsService.remove(id);

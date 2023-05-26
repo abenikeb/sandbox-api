@@ -24,6 +24,9 @@ export class Configuration {
   @Prop({ required: true })
   public_key: string;
 
+  @Prop()
+  notify_url: string;
+
   //   @Prop({ required: true })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user_id: User;

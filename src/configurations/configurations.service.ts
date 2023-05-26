@@ -67,6 +67,14 @@ export class ConfigurationsService {
       },
     );
   }
+  async updateNotifyUrl(id: string, url: string): Promise<Configuration> {
+    return this.configurationModel.findOneAndUpdate(
+      { user_id: id },
+      {
+        notify_url: url,
+      },
+    );
+  }
 
   async remove(id: string): Promise<Configuration> {
     const deleteConfig = await this.configurationModel
