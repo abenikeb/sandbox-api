@@ -21,13 +21,10 @@ export class Configuration {
   @Prop({ required: true })
   private_key: string;
 
-  @Prop({ required: true })
+  @Prop({ required: { true: 'The publick key not allowed null' } })
   public_key: string;
 
-  //   @Prop({ required: true })
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user_id: User;
-  //   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  //   user_id: User;
 }
 export const ConfigurationSchema = SchemaFactory.createForClass(Configuration);
