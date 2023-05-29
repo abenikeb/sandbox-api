@@ -36,29 +36,29 @@ export function generateMerchantAppId() {
 }
 
 export function generateRSAKeyPairs() {
-  // const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-  //   modulusLength: 2048,
-  //   publicKeyEncoding: {
-  //     type: 'spki',
-  //     format: 'pem'
-  //   },
-  //   privateKeyEncoding: {
-  //     type: 'pkcs8',
-  //     format: 'pem',
-  //     cipher: 'aes-256-cbc',
-  //     passphrase: 'my-secret-passphrase'
-  //   },
-  //   hash: 'sha256'
-  // });
+  const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    publicKeyEncoding: {
+      type: 'spki',
+      format: 'pem',
+    },
+    privateKeyEncoding: {
+      type: 'pkcs8',
+      format: 'pem',
+      cipher: 'aes-256-cbc',
+      passphrase: 'my-secret-passphrase',
+    },
+    hash: 'sha256',
+  });
 
-  // Generate private key and store it in a string variable
-  const privateKey = execSync(
-    `openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048`,
-  ).toString();
+  // // Generate private key and store it in a string variable
+  // const privateKey = execSync(
+  //   `openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048`,
+  // ).toString();
 
-  // Extract public key from private key and store it in a string variable
-  // const publicKey = execSync(`openssl pkey -in ${privateKey} | openssl pkey -pubout`).toString();
-  const publicKey = execSync(`openssl pkey -in ${privateKey}`).toString();
+  // // Extract public key from private key and store it in a string variable
+  // // const publicKey = execSync(`openssl pkey -in ${privateKey} | openssl pkey -pubout`).toString();
+  // const publicKey = execSync(`openssl pkey -in ${privateKey}`).toString();
 
   console.log('Private Key:', privateKey);
   console.log('Public Key:', publicKey);

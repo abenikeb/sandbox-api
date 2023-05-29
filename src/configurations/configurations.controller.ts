@@ -20,7 +20,8 @@ export class ConfigurationsController {
 
   @Post(':id')
   @UseFilters(MongoExceptionFilter)
-  create(@Param('id') id: string) {
+  create(@Param('id') id: any) {
+    console.log(id);
     try {
       return this.configurationsService.create(id);
     } catch (error) {
