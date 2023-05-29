@@ -15,31 +15,29 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto, res): Promise<any> {
     const existUser = await this.userModel
-      .findOne({ username: createUserDto.username })
+      .findOne({ email: createUserDto.email })
       .exec();
 
-    if (existUser) return res.status('400').send('The user Alerady registered');
+    if (existUser) return res.status(400).send('The user Alerady registered');
 
     let salt = await GenerateSalt();
     const userPassword = await GeneratePassword(createUserDto.password, salt);
 
     const userData = {
-      username: createUserDto.username,
+      firstName: createUserDto?.firstName,
+      lastName: createUserDto?.lastName,
+      tel: createUserDto?.tel,
+      email: createUserDto?.email,
       password: userPassword,
-      email: createUserDto.email,
       salt: salt,
     };
-
-    // const { password, ...newPayload } = userData;
 
     let createdUser = await this.userModel.create(userData);
     createdUser = await createdUser.save();
 
-    // const { password, ...otherUserInfo } = createdUser;
+    const { password, lastName, tel, ...otherUserInfo } = userData;
 
-    // console.log(otherUserInfo);
-
-    const token = await this.jwtService.signAsync(userData);
+    const token = await this.jwtService.signAsync(otherUserInfo);
 
     return res
       .header('x-auth-token', token)
@@ -57,8 +55,8 @@ export class UserService {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
-  async findOneWithUser(username: string): Promise<User> {
-    return this.userModel.findOne({ username: username }).exec();
+  async findOneWithEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ email }).exec();
   }
 
   async delete(id: string) {
