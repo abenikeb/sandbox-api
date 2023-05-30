@@ -2,8 +2,14 @@ import { IsNotEmpty, Length, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
-  @Length(7, 12)
-  username: string;
+  @Length(2, 15)
+  firstName: string;
+
+  @Length(1, 15)
+  lastName: string;
+
+  @IsNotEmpty()
+  tel: string;
 
   @IsNotEmpty()
   @Length(5, 250)

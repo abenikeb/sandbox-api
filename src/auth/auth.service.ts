@@ -10,11 +10,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(username, pass, res) {
-    const existUser = await this.usersService.findOneWithUser(username);
+  async signIn(email, pass, res) {
+    const existUser = (await this.usersService.findOneWithEmail(email)) as any;
 
     if (!existUser)
-      return res.status(400).json({ message: 'Invalid user name or password' });
+      return res.status(400).send('Invalid user name or password');
 
     let validPassword = await ValidatePassword(
       pass,
@@ -23,7 +23,12 @@ export class AuthService {
     );
     if (!validPassword) throw new UnauthorizedException();
 
-    let payload = { username: existUser.username, sub: existUser.email };
+    let payload = {
+      id: existUser?._id,
+      email: existUser.email,
+      firstName: existUser.firstName,
+    };
+
     return res.status(200).json({
       access_token: await this.jwtService.signAsync(payload),
     });
