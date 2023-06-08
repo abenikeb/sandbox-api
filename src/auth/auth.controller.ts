@@ -12,6 +12,7 @@ import {
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { AuthGuard } from './auth.guard';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
