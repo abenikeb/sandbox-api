@@ -55,6 +55,7 @@ export class MokeApiService {
       };
     }
   }
+
   async createOrder(
     token: string,
     fabric_app_id: string,
@@ -110,6 +111,7 @@ export class MokeApiService {
       };
     }
   }
+
   async queryOrder(
     token: string,
     fabric_app_id: string,
@@ -175,6 +177,7 @@ export class MokeApiService {
       };
     }
   }
+
   async payment(value: any, token: string, fabric_app_id: string) {
     const result = await this.configurationsService.findByAll(
       fabric_app_id,
@@ -217,7 +220,7 @@ export class MokeApiService {
     } else {
       this.info.trade_status = 'Completed';
       this.info.trans_time = Date.now().toString();
-      await this.callback(value[0], value[1]);
+      // await this.callback(value[0], value[1]);
       return {
         result: 'SUCCESS',
         code: '0',
@@ -227,6 +230,7 @@ export class MokeApiService {
       };
     }
   }
+
   async callback(appId: string, merch_code: string) {
     // const url = 'http://localhost:8081/notify/transaction';
     const response = await axios.post(this.info.notify_url, {

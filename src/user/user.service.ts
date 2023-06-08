@@ -35,15 +35,27 @@ export class UserService {
     let createdUser = await this.userModel.create(userData);
     createdUser = await createdUser.save();
 
-    const { password, lastName, tel, ...otherUserInfo } = userData;
+    let payload = {
+      firstName: createUserDto?.firstName,
+      lastName: createUserDto?.lastName,
+      tel: createUserDto?.tel,
+      email: createUserDto?.email,
+      id: createdUser._id,
+    };
 
-    const token = await this.jwtService.signAsync(otherUserInfo);
+    console.log('payload', payload);
+
+    // const { password, lastName, tel, ...otherUserInfo } = userData;
+    // const { password, role, createdAt, updatedAt, ...otherUserInfo } =
+    //   createdUser;
+
+    const token = await this.jwtService.signAsync(payload);
 
     return res
       .header('x-auth-token', token)
       .header('access-control-expose-headers', 'x-auth-token')
       .json({
-        userInfo: createdUser,
+        userInfo: payload,
       });
   }
 
