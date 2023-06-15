@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    script: 'npm start 2'
+    script: 'api'
   }],
 
   deploy: {
