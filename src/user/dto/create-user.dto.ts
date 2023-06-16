@@ -15,6 +15,6 @@ export class CreateUserDto {
   @Length(5, 250)
   password: string;
 
-  @IsEmail()
+  @IsNotEmpty()
   email: string;
 }
