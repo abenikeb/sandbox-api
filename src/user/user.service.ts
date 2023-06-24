@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
 import { GeneratePassword, GenerateSalt } from '../utility';
+import { ValidatePassword } from '../utility';
 
 @Injectable()
 export class UserService {
@@ -21,14 +22,14 @@ export class UserService {
     if (existUser) return res.status(400).send('The user Alerady registered');
 
     let salt = await GenerateSalt();
-    const userPassword = await GeneratePassword(createUserDto.password, salt);
+    const hashedPassword = await GeneratePassword(createUserDto.password, salt);
 
     const userData = {
       firstName: createUserDto?.firstName,
       lastName: createUserDto?.lastName,
       tel: createUserDto?.tel,
       email: createUserDto?.email,
-      password: userPassword,
+      password: hashedPassword,
       salt: salt,
     };
 
@@ -42,12 +43,6 @@ export class UserService {
       email: createUserDto?.email,
       id: createdUser._id,
     };
-
-    console.log('payload', payload);
-
-    // const { password, lastName, tel, ...otherUserInfo } = userData;
-    // const { password, role, createdAt, updatedAt, ...otherUserInfo } =
-    //   createdUser;
 
     const token = await this.jwtService.signAsync(payload);
 
@@ -84,6 +79,31 @@ export class UserService {
     return res.json({
       updatedUser,
     });
+  }
+
+  async validateUserPassword(id: any, currentPassword: any) {
+    const existUser = (await this.userModel.findOne({ _id: id })) as any;
+
+    let validPassword = await ValidatePassword(
+      currentPassword,
+      existUser.password,
+      existUser.salt,
+    );
+    if (!validPassword) return false;
+    return true;
+  }
+
+  async updateUserPassword(userId: any, newPassword: any) {
+    let salt_ = await GenerateSalt();
+    const hashedPassword = await GeneratePassword(newPassword, salt_);
+
+    console.log({ _id: userId });
+    console.log({ salt_: salt_ });
+
+    const user = await this.userModel.findById(userId);
+    user.password = hashedPassword;
+    user.salt = salt_;
+    user.save();
   }
 
   async delete(id: string) {

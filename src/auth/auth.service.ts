@@ -21,6 +21,7 @@ export class AuthService {
       existUser.password,
       existUser.salt,
     );
+
     if (!validPassword) throw new UnauthorizedException();
 
     let payload = {

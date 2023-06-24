@@ -41,6 +41,33 @@ export class UserController {
     await this.userService.update(id, UpdateUserDto, res);
   }
 
+  @Patch('updatePassword/:id')
+  async updatePassword(
+    @Param('id') id: string,
+    @Body() updatePasswordDto: any,
+  ): Promise<{ success: boolean }> {
+    const { userId, currentPassword, newPassword } = updatePasswordDto;
+    console.log({
+      currentPassword,
+      newPassword,
+    });
+
+    // Verify that the user's current password matches the password stored in the mongo db
+    const isValidPassword = await this.userService.validateUserPassword(
+      id,
+      currentPassword,
+    );
+
+    if (!isValidPassword) {
+      return { success: false };
+    }
+
+    // Update the user's password in the database with the new password
+    await this.userService.updateUserPassword(id, newPassword);
+
+    return { success: true };
+  }
+
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.userService.delete(id);
