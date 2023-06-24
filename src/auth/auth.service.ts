@@ -27,6 +27,8 @@ export class AuthService {
       id: existUser?._id,
       email: existUser.email,
       firstName: existUser.firstName,
+      lastName: existUser.lastName,
+      tel: existUser.tel,
     };
 
     return res.status(200).json({

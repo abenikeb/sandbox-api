@@ -71,6 +71,21 @@ export class UserService {
     return this.userModel.findOne({ email }).exec();
   }
 
+  async update(id: string, updateUserDto: any, res): Promise<any> {
+    let updatedUser = await this.userModel.findOneAndUpdate(
+      { _id: id },
+      {
+        firstName: updateUserDto.firstName,
+        lastName: updateUserDto.lastName,
+        tel: updateUserDto.tel,
+        email: updateUserDto.email,
+      },
+    );
+    return res.json({
+      updatedUser,
+    });
+  }
+
   async delete(id: string) {
     const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
