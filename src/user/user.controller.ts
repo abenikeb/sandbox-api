@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Patch,
   Get,
   Res,
   Param,
@@ -29,6 +30,15 @@ export class UserController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(id);
+  }
+
+  @Patch(':id')
+  async put(
+    @Param('id') id: string,
+    @Body() UpdateUserDto: any,
+    @Res() res: Response,
+  ) {
+    await this.userService.update(id, UpdateUserDto, res);
   }
 
   @Delete(':id')
