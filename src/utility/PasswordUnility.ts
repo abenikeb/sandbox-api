@@ -13,5 +13,11 @@ export const ValidatePassword = async (
   savedPassword: string,
   salt: string,
 ) => {
+  console.log({
+    enteredPassword: enteredPassword,
+    hasdePass: await GeneratePassword(enteredPassword, salt),
+    savedPassword: savedPassword,
+    salt: salt,
+  });
   return (await GeneratePassword(enteredPassword, salt)) === savedPassword;
 };

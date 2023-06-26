@@ -38,13 +38,23 @@ export class AuthService {
         existUser.password,
         existUser.salt,
       );
+      // if (!validPassword) throw new UnauthorizedException();
+
       if (!validPassword) throw new UnauthorizedException();
 
       const payload = {
         id: existUser?._id,
         email: existUser.email,
         firstName: existUser.firstName,
+        lastName: existUser.lastName,
+        tel: existUser.tel,
       };
+
+      // const payload = {
+      //   id: existUser?._id,
+      //   email: existUser.email,
+      //   firstName: existUser.firstName,
+      // };
 
       return res.status(200).json({
         access_token: await this.jwtService.signAsync(payload),
