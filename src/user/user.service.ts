@@ -14,49 +14,70 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto, res): Promise<any> {
-    const existUser = await this.userModel
-      .findOne({ email: createUserDto.email })
-      .exec();
-
-    if (existUser) return res.status(400).send('The user Alerady registered');
-
-    let salt = await GenerateSalt();
-    const userPassword = await GeneratePassword(createUserDto.password, salt);
-
-    const userData = {
-      firstName: createUserDto?.firstName,
-      lastName: createUserDto?.lastName,
-      tel: createUserDto?.tel,
-      email: createUserDto?.email,
-      password: userPassword,
-      salt: salt,
-    };
-
-    let createdUser = await this.userModel.create(userData);
-    createdUser = await createdUser.save();
-
-    let payload = {
-      firstName: createUserDto?.firstName,
-      lastName: createUserDto?.lastName,
-      tel: createUserDto?.tel,
-      email: createUserDto?.email,
-      id: createdUser._id,
-    };
-
-    console.log('payload', payload);
-
-    // const { password, lastName, tel, ...otherUserInfo } = userData;
-    // const { password, role, createdAt, updatedAt, ...otherUserInfo } =
-    //   createdUser;
-
-    const token = await this.jwtService.signAsync(payload);
-
-    return res
-      .header('x-auth-token', token)
-      .header('access-control-expose-headers', 'x-auth-token')
-      .json({
-        userInfo: payload,
+    if (!createUserDto.captchaCode) {
+      return res.status(422).json({
+        message: 'Unproccesable request, please provide the required fields',
       });
+    }
+    const response = await fetch(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${createUserDto.captchaCode}`,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        },
+        method: 'POST',
+      },
+    );
+    const captchaValidation = await response.json();
+    if (captchaValidation.success) {
+      const existUser = await this.userModel
+        .findOne({ email: createUserDto.email })
+        .exec();
+
+      if (existUser) return res.status(400).send('The user Alerady registered');
+
+      const salt = await GenerateSalt();
+      const userPassword = await GeneratePassword(createUserDto.password, salt);
+
+      const userData = {
+        firstName: createUserDto?.firstName,
+        lastName: createUserDto?.lastName,
+        tel: createUserDto?.tel,
+        email: createUserDto?.email,
+        password: userPassword,
+        salt: salt,
+      };
+
+      let createdUser = await this.userModel.create(userData);
+      createdUser = await createdUser.save();
+
+      const payload = {
+        firstName: createUserDto?.firstName,
+        lastName: createUserDto?.lastName,
+        tel: createUserDto?.tel,
+        email: createUserDto?.email,
+        id: createdUser._id,
+      };
+
+      console.log('payload', payload);
+
+      // const { password, lastName, tel, ...otherUserInfo } = userData;
+      // const { password, role, createdAt, updatedAt, ...otherUserInfo } =
+      //   createdUser;
+
+      const token = await this.jwtService.signAsync(payload);
+
+      return res
+        .header('x-auth-token', token)
+        .header('access-control-expose-headers', 'x-auth-token')
+        .json({
+          userInfo: payload,
+        });
+    }
+
+    return res.status(422).json({
+      message: 'Unproccesable request, Invalid captcha code',
+    });
   }
 
   async findAll(): Promise<User[]> {

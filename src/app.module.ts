@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { MokeApiModule } from './moke_api/moke_api.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MokeApiModule } from './moke_api/moke_api.module';
     ConfigModule,
     ConfigurationsModule,
     MokeApiModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
