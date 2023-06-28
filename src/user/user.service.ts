@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
-import { GeneratePassword, GenerateSalt } from '../utility';
+import { GeneratePassword, GenerateSalt, ValidatePassword } from '../utility';
 
 @Injectable()
 export class UserService {
