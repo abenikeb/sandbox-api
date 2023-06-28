@@ -86,6 +86,30 @@ export class UserService {
     });
   }
 
+  async validateUserPassword(id: any, currentPassword: any) {
+    const existUser = (await this.userModel.findOne({ _id: id })) as any;
+
+    const validPassword = await ValidatePassword(
+      currentPassword,
+      existUser.password,
+      existUser.salt,
+    );
+    if (!validPassword) return false;
+    return true;
+  }
+
+  async updateUserPassword(userId: any, newPassword: any) {
+    const salt_ = await GenerateSalt();
+    const hashedPassword = await GeneratePassword(newPassword, salt_);
+
+    console.log({ _id: userId });
+    console.log({ salt_: salt_ });
+
+    const user = await this.userModel.findById(userId);
+    user.password = hashedPassword;
+    user.salt = salt_;
+    user.save();
+  }
   async delete(id: string) {
     const deletedUser = await this.userModel
       .findByIdAndRemove({ _id: id })
