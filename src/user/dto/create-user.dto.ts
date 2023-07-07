@@ -17,6 +17,6 @@ export class CreateUserDto {
 
   @IsEmail()
   email: string;
-  @IsNotEmpty()
-  captchaCode: string;
+  // @IsNotEmpty()
+  // captchaCode: string;
 }

@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 import { User } from './schemas/user.schema';
 import { Response } from 'express';
 
@@ -17,6 +18,7 @@ import { Response } from 'express';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Public()
   @Post('signup')
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     await this.userService.create(createUserDto, res);
@@ -40,6 +42,7 @@ export class UserController {
   ) {
     await this.userService.update(id, UpdateUserDto, res);
   }
+
   @Patch('updatePassword/:id')
   async updatePassword(
     @Param('id') id: string,
@@ -66,6 +69,7 @@ export class UserController {
 
     return { success: true };
   }
+
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.userService.delete(id);

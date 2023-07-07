@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
 const cors = require('cors');
 
 async function bootstrap() {
@@ -25,8 +26,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
   const port = configService.get('PORT');
+  app.use(helmet());
   await app.listen(port);
 }
 

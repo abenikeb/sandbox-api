@@ -8,6 +8,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
+import { AuthGuard } from './auth/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 import { MokeApiModule } from './moke_api/moke_api.module';
 import { PostModule } from './post/post.module';
 
@@ -31,6 +33,12 @@ import { PostModule } from './post/post.module';
     PostModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}
