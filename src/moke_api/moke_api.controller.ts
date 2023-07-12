@@ -15,6 +15,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 export class MokeApiController {
   constructor(private readonly mokeApiService: MokeApiService) {}
 
+  @Public()
   @Post('applyFabricToken')
   applyFabricToken(
     @Body() body: ApplyFabricTokenDto,
