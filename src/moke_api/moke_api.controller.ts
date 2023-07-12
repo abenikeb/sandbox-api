@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { MokeApiService } from './moke_api.service';
 import { ApplyFabricTokenDto } from './dto/applyFabricToken.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('moke-api')
 export class MokeApiController {
@@ -47,6 +48,7 @@ export class MokeApiController {
     return this.mokeApiService.applyFabricToken(body.appSecret, headers);
   }
   //CreateOrder
+  @Public()
   @Post('preOrder')
   createOrder(
     @Body() body: any,
@@ -129,6 +131,7 @@ export class MokeApiController {
     );
   }
   //payment
+  @Public()
   @Post('checkout')
   payment(
     @Body() body: any,
@@ -216,6 +219,7 @@ export class MokeApiController {
     }
   }
   //Query Order
+  @Public()
   @Post('queryOrder')
   queryOrder(
     @Body() body: any,

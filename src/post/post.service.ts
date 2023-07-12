@@ -8,10 +8,12 @@ import { UpdatePostDto } from './dto/update-post.dto';
 @Injectable()
 export class PostService {
   constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
-  async create(createPostDto: any): Promise<Post> {
-    const createdPost = new this.postModel(CreatePostDto);
-    return createdPost.save();
+
+  async create(createPostDto: any): Promise<void> {
+    const createPost = await this.postModel.create(createPostDto);
+    await createPost.save();
   }
+
   async findAll(): Promise<Post[]> {
     return this.postModel.find().exec();
   }

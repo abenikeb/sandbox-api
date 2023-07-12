@@ -6,16 +6,28 @@ export type PostDocument = HydratedDocument<Post>;
 export class Post {
   @Prop({ required: true })
   title: string;
+
   @Prop({ required: true })
-  description: string;
+  content: string;
+
   @Prop({ required: true })
-  createdAt: Date;
+  author_firstName: string;
+
   @Prop({ required: true })
-  updatedAt: Date;
+  author_lastName: string;
+
+  @Prop({ required: true })
+  created_at: Date;
+
+  @Prop({ required: true })
+  updated_at: Date;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  author: User;
+  author_id: User;
+
   @Prop()
   upVote: number;
+
   @Prop()
   downVote: number;
 }
