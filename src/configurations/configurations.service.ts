@@ -9,6 +9,7 @@ import {
   generateRSAKeyPairs,
   generateShortCode,
 } from './util/tools.helper';
+import { getCredientials } from './util/credientials';
 @Injectable()
 export class ConfigurationsService {
   constructor(
@@ -17,13 +18,14 @@ export class ConfigurationsService {
   ) {}
   async create(id: string): Promise<Configuration> {
     const RSAKeyPairs = await generateRSAKeyPairs();
+    const credientials = getCredientials();
     const createConfig = await this.configurationModel.create({
-      merchant_id: generateMerchantAppId(),
-      fabric_app_id: generateFabricAppKey(),
-      app_secret: generateAppSecret(),
-      short_code: generateShortCode(),
+      merchant_id: credientials.merchantAppId,
+      fabric_app_id: credientials.fabricAppId,
+      app_secret: credientials.appSecret,
+      short_code: credientials.merchantCode,
       user_id: id,
-      private_key: RSAKeyPairs.privateKey,
+      private_key: credientials.privateKey,
       public_key: RSAKeyPairs.publicKey,
     });
     return createConfig.save();
@@ -35,6 +37,12 @@ export class ConfigurationsService {
   async findBy(app_secret: string, fabric_app_id: string): Promise<any> {
     const result = await this.configurationModel
       .findOne({ app_secret: app_secret, fabric_app_id: fabric_app_id })
+      .exec();
+    return result;
+  }
+  async findByUserId(user_id: string): Promise<any> {
+    const result = await this.configurationModel
+      .findOne({ user_id: user_id })
       .exec();
     return result;
   }
