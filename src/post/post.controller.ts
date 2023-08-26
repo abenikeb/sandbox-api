@@ -20,7 +20,8 @@ export class PostController {
   @Public()
   create(@Body() createPostDto: CreatePostDto) {
     console.log('createPostDto', createPostDto);
-    return this.postService.create(createPostDto);
+    console.log(createPostDto);
+    // return this.postService.create(createPostDto);
   }
 
   @Get()
