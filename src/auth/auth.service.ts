@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { ValidatePassword } from '../utility';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,8 @@ export class AuthService {
         message: 'Unproccesable request, please provide the required fields',
       });
     }
-    const response = await fetch(
+
+    const { data: captchaValidation } = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaCode}`,
       {
         headers: {
@@ -25,7 +27,7 @@ export class AuthService {
         method: 'POST',
       },
     );
-    const captchaValidation = await response.json();
+
     if (captchaValidation.success) {
       const existUser = (await this.usersService.findOneWithEmail(
         email,
@@ -38,7 +40,6 @@ export class AuthService {
         existUser.password,
         existUser.salt,
       );
-      // if (!validPassword) throw new UnauthorizedException();
 
       if (!validPassword) throw new UnauthorizedException();
 
@@ -49,12 +50,6 @@ export class AuthService {
         lastName: existUser.lastName,
         tel: existUser.tel,
       };
-
-      // const payload = {
-      //   id: existUser?._id,
-      //   email: existUser.email,
-      //   firstName: existUser.firstName,
-      // };
 
       return res.status(200).json({
         access_token: await this.jwtService.signAsync(payload),

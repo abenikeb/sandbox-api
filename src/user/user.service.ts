@@ -57,13 +57,6 @@ export class UserService {
       .json({
         userInfo: payload,
       });
-
-    //  return res
-    //    .header('x-auth-token', token)
-    //    .header('access-control-expose-headers', 'x-auth-token')
-    //    .json({
-    //      userInfo: payload,
-    //    });
   }
 
   async findAll(): Promise<User[]> {
