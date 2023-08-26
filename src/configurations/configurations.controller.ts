@@ -14,10 +14,12 @@ import { ConfigurationsService } from './configurations.service';
 import { MongoExceptionFilter } from './util/errorHanddler';
 import { UpdateNotifyDto } from './dto/update-notify.dto';
 
+// import { Public } from 'src/auth/decorators/public.decorator'; for testing
+
 @Controller('configurations')
 export class ConfigurationsController {
   constructor(private readonly configurationsService: ConfigurationsService) {}
-
+  // @Public()
   @Post(':id')
   @UseFilters(MongoExceptionFilter)
   create(@Param('id') id: any) {
@@ -60,10 +62,10 @@ export class ConfigurationsController {
   findAll() {
     return this.configurationsService.findAll();
   }
-
+  // @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.configurationsService.findOne(id);
+    return this.configurationsService.findByUserId(id);
   }
 
   @Patch(':id')
