@@ -30,5 +30,14 @@ export class Post {
 
   @Prop()
   downVote: number;
+
+  @Prop()
+  replies: [
+    {
+      message: { type: String };
+      timestamp: { type: Date; default: Date };
+      author_id: { type: mongoose.Schema.Types.ObjectId; ref: 'User' };
+    },
+  ];
 }
 export const PostSchema = SchemaFactory.createForClass(Post);

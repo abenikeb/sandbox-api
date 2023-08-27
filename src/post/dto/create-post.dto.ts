@@ -1,4 +1,11 @@
-import { IsDate, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IS_ARRAY,
+  IsEmpty,
+  IsArray,
+} from 'class-validator';
 import mongoose from 'mongoose';
 export class CreatePostDto {
   // @IsNotEmpty()
@@ -33,4 +40,13 @@ export class CreatePostDto {
 
   @IsNumber()
   downVote: number;
+
+  @IsArray()
+  replies: [
+    {
+      message: string;
+      timestamp: Date;
+      author_id: string;
+    },
+  ];
 }
