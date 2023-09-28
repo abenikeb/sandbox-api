@@ -27,7 +27,7 @@ export class Merchant {
   @Prop({ type: String, required: true })
   officialWebsite: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true,default:"IT" })
   businessCatagory: string;
   
   @Prop({ required: true, default: "incomplete" })

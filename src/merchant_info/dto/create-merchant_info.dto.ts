@@ -22,7 +22,7 @@ export class CreateMerchantInfoDto {
     contactPersonName: string;
 
     @IsNotEmpty()
-    @IsPhoneNumber()
+    // @IsPhoneNumber()
     contactPhone: string;
 
     @IsNotEmpty()
@@ -33,7 +33,7 @@ export class CreateMerchantInfoDto {
     @IsUrl()
     officialWebsite: string;
 
-    @IsNotEmpty()
+    // @IsNotEmpty()
     businessCatagory: string;
 
     @IsNotEmpty()
