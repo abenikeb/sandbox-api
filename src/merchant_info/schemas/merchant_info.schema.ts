@@ -51,7 +51,7 @@ export class Merchant {
   @Prop()
   fabricAppId:string
 
-  @Prop()
+  @Prop({ type: String, maxlength: 2048 })
   privateKey:string
 }
 
