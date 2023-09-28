@@ -27,6 +27,7 @@ async function bootstrap() {
     }),
   );
   const port = configService.get('PORT');
+  console.log(port)
   app.use(helmet());
   await app.listen(port);
 }

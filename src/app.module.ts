@@ -12,6 +12,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { MokeApiModule } from './moke_api/moke_api.module';
 import { PostModule } from './post/post.module';
+import { MerchantInfoModule } from './merchant_info/merchant_info.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PostModule } from './post/post.module';
     ConfigurationsModule,
     MokeApiModule,
     PostModule,
+    MerchantInfoModule,
   ],
   controllers: [AppController],
   providers: [

@@ -23,12 +23,12 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     await this.userService.create(createUserDto, res);
   }
-
+  @Public()
   @Get()
   async findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
-
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(id);
