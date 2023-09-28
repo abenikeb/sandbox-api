@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateMerchantInfoDto } from './dto/create-merchant_info.dto';
 import { UpdateMerchantInfoDto } from './dto/update-merchant_info.dto';
 import { generateShortCode } from 'src/configurations/util/tools.helper';
@@ -17,16 +17,12 @@ export class MerchantInfoService {
   
   async create(createMerchantInfoDto: CreateMerchantInfoDto) {
     let short_code = generateShortCode();
-    // let short_code_exist = await this.MerchantModel
-    //   .findOne({ short_code: short_code })
-    //   .exec();
-    // while (short_code_exist) {
-    //    short_code = generateShortCode();
-    //    short_code_exist = await this.MerchantModel
-    //   .findOne({ short_code: short_code })
-    //   .exec();
-    // }
-
+    let same_code = await this.mmServicesService.getOrgCredInfo(short_code)
+    let same_code_db = await this.MerchantModel.findOne({short_code:short_code})
+    if (same_code?.shortCode || same_code_db) {
+      short_code = generateShortCode()
+    }
+    console.log(`Last Product: ${short_code}`)
     const merchant_info = {
       businessCatagory:createMerchantInfoDto.businessCatagory,
       companyName:createMerchantInfoDto.companyName,
@@ -43,17 +39,42 @@ export class MerchantInfoService {
     }
 const existingMerchant = await this.MerchantModel.findOne({ developerTeamName: createMerchantInfoDto.developerTeamName });
 const existingCompany = await this.MerchantModel.findOne({ companyName: createMerchantInfoDto.companyName });
-if (existingMerchant || existingCompany) {
-  return {
-    "message":"Already exist"
-  }
-} else {
+const user_idExist = await this.MerchantModel.findOne({ user_id: createMerchantInfoDto.user_id });
+
+if (existingMerchant) {
+  throw new HttpException(
+    {
+      error_code: 'SYS0001',
+      error_msg: 'DeveloperTeam Already Exist',
+    },
+    HttpStatus.BAD_REQUEST,
+  );
+} 
+else if(user_idExist){
+  throw new HttpException(
+    {
+      error_code: 'SYS0002',
+      error_msg: 'User Already Exist',
+    },
+    HttpStatus.BAD_REQUEST,
+  );
+}
+else if(existingCompany){
+  throw new HttpException(
+    {
+      error_code: 'SYS0002',
+      error_msg: 'Company Already Exist',
+    },
+    HttpStatus.BAD_REQUEST,
+  );
+}
+else {
   let createMerchant = await this.MerchantModel.create(merchant_info)
-  createMerchant.save().then(res=>{
+  await createMerchant.save().then(res=>{
     console.log(`company with shortcode ${res.short_code} and name ${res.companyName} was created`)
-    return this.mmServicesService.createTopOrg(short_code,res.companyName)
-    
+    this.mmServicesService.createTopOrg(short_code,res.companyName)
   })
+  return this.MerchantModel.findOne({ user_id:merchant_info.user_id }).exec();
 }
     
   }
@@ -65,32 +86,32 @@ if (existingMerchant || existingCompany) {
   async findOneWithSortCode(user_id:any): Promise<Merchant> {
     const mertchstatus = await this.MerchantModel.findOne({ user_id }).exec();
     console.log(JSON.stringify(mertchstatus))
-    const credientials = await this.mmServicesService.getOrgCredInfo(mertchstatus.short_code)
+    const credientials = await this.mmServicesService.getOrgCredInfo(mertchstatus?.short_code)
     console.log(JSON.stringify(credientials))
-    // if(credientials?.shortCode){
-    //   console.log(credientials.short_code)
-    //   return this.MerchantModel.findOneAndUpdate({user_id:user_id},{status:"completed"})
+    if(credientials?.shortCode){
+      console.log(credientials?.shortCode)
+      await this.mmServicesService.setOrgPublicKey(mertchstatus?.short_code)
+      await this.MerchantModel.findOneAndUpdate({user_id:user_id},{status:"completed"})
       
-    // return this.MerchantModel.findOne({ user_id }).exec();
-    // }
-    // else{ 
-    // console.log("else ")
       return this.MerchantModel.findOne({ user_id }).exec();
 
-    // }
+    }
+    else{ 
+      return this.MerchantModel.findOne({ user_id }).exec();
+    }
   }
 
-  async updateComplete(short_code: Number, updateMerchantInfoDto: any,res): Promise<any>{
-    const updatedMerchant = await this.MerchantModel.findOneAndUpdate(
-      { short_code: short_code},
-      {
-        status:"completed"
-      },
-    );
-    return res.json({
-      updatedMerchant,
-    });
-  }
+  // async updateComplete(short_code: Number, updateMerchantInfoDto: any,res): Promise<any>{
+  //   const updatedMerchant = await this.MerchantModel.findOneAndUpdate(
+  //     { short_code: short_code},
+  //     {
+  //       status:"completed"
+  //     },
+  //   );
+  //   return res.json({
+  //     updatedMerchant,
+  //   });
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} merchantInfo`;
