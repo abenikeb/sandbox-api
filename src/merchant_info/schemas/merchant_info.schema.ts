@@ -50,6 +50,10 @@ export class Merchant {
   
   @Prop()
   fabricAppId:string
+
+  @Prop()
+  privateKey:string
 }
+
 
 export const MerchantSchema = SchemaFactory.createForClass(Merchant);

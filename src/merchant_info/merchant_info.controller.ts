@@ -42,9 +42,9 @@ export class MerchantInfoController {
   }
   @Public()
 
-  @Get('user')
-  findOne(@Body() data:any) {
-    return this.merchantInfoService.findOneWithSortCode(data.user_id);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.merchantInfoService.findOneWithSortCode(id);
   }
 
   // @Patch(':id')
