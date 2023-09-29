@@ -22,7 +22,6 @@ export class MerchantInfoService {
     if (same_code?.shortCode || same_code_db) {
       short_code = generateShortCode()
     }
-    console.log(`Last Product: ${short_code}`)
     const merchant_info = {
       businessCatagory:createMerchantInfoDto.businessCatagory,
       companyName:createMerchantInfoDto.companyName,
@@ -71,7 +70,12 @@ else if(existingCompany){
 else {
   let createMerchant = await this.MerchantModel.create(merchant_info)
   await createMerchant.save().then(res=>{
-    console.log(`company with shortcode ${res.short_code} and name ${res.companyName} was created`)
+    console.log(`
+    ============================================
+    Company Name: {${merchant_info.companyName}}
+    ============================================
+    ShortCode: ${merchant_info.short_code}
+    ============================================`)
     this.mmServicesService.createTopOrg(short_code,res.companyName)
   })
   return this.MerchantModel.findOne({ user_id:merchant_info.user_id }).exec();
