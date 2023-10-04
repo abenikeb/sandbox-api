@@ -5,6 +5,7 @@ import { Merchant, MerchantSchema } from './schemas/merchant_info.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HttpModule } from '@nestjs/axios';
 import { MmServicesService } from 'src/mm_services/mm_services.service';
+import { AppcubeServiceService } from 'src/appcube_service/appcube_service.service';
 
 @Module({
   
@@ -13,6 +14,6 @@ import { MmServicesService } from 'src/mm_services/mm_services.service';
     MongooseModule.forFeature([{ name: Merchant.name, schema: MerchantSchema }]),
   ],
   controllers: [MerchantInfoController],
-  providers: [MerchantInfoService,MmServicesService]
+  providers: [MerchantInfoService,MmServicesService,AppcubeServiceService]
 })
 export class MerchantInfoModule {}
