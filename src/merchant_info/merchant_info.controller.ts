@@ -41,10 +41,14 @@ export class MerchantInfoController {
     return this.merchantInfoService.findAll();
   }
   @Public()
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.merchantInfoService.findOneWithSortCode(id);
+  }
+  @Public()
+  @Post('setUp')
+  setUpManagementConsole(){
+    return this.merchantInfoService.setUpManagementConsole();
   }
 
   // @Patch(':id')

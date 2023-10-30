@@ -88,6 +88,9 @@ else {
   async findAll(): Promise<Merchant[]> {
     return this.MerchantModel.find().exec();
   } 
+  async setUpManagementConsole(): Promise<Merchant> {
+   return await this.appcubeServiceService.setUpManagementConsole();
+  }
 
   async findOneWithSortCode(user_id:any): Promise<Merchant> {
     const mertchstatus = await this.MerchantModel.findOne({ user_id }).exec();
